@@ -8,6 +8,8 @@ def index(request):
 
 def oc(request):
     return render(request,"opencf.html")
+def fl(request):
+    return render(request,"fl.html")
 
 
 import math
@@ -31,7 +33,7 @@ class Openchannalflow:
         D=A/t
         V = (1/self.n)*(R**(2/3))*(self.s**0.5)
         Q = A*V
-        result = {'flow_area':A,"wetted_perimeter":P,"hydraulic_radius":R,"topwidth":t,"hydraulic_depth":D,"velocity":V,"flow":Q}
+        result = {'z1':self.z1,'z2':self.z2,'bottom_width':self.b,'water_depth':self.y,'channel_slope':self.s,'flow_area':A,"wetted_perimeter":P,"hydraulic_radius":R,"topwidth":t,"hydraulic_depth":D,"velocity":V,"flow":Q}
         return result
 
 
@@ -43,57 +45,42 @@ class Openchannalflow:
         D=A/t
         V = (1/self.n)*(R**(2/3))*(self.s**0.5)
         Q = A*V
-        result = {'flow_area':A,"wetted_perimeter":P,"hydraulic_radius":R,"topwidth":t,"hydraulic_depth":D,"velocity":V,"flow":Q}
+        result = {'bottom_width':self.b,'water_depth':self.y,'channel_slope':self.s,'flow_area':A,"wetted_perimeter":P,"hydraulic_radius":R,"topwidth":t,"hydraulic_depth":D,"velocity":V,"flow":Q}
         return result
 
 
     def Triangle(self):
-        t = (self.z1 + self.z2) * self.y
-        A = 0.5 * t * self.y
-        P = self.y * (math.sqrt(1+self.z1**2) + math.sqrt(1+self.z2**2))
+        A = self.m*self.y*self.y
+        P = 2*self.y*(math.sqrt(1+self.m*self.m))
         R = A/P
+        t = 2*self.m*self.y
         D=A/t
         V = (1/self.n)*(R**(2/3))*(self.s**0.5)
         Q = A*V
-        result = {'flow_area':A,"wetted_perimeter":P,"hydraulic_radius":R,"topwidth":t,"hydraulic_depth":D,"velocity":V,"flow":Q}
+        result = {'z1':self.z1,'z2':self.z2,'bottom_width':self.b,'water_depth':self.y,'channel_slope':self.s,'flow_area':A,"wetted_perimeter":P,"hydraulic_radius":R,"topwidth":t,"hydraulic_depth":D,"velocity":V,"flow":Q}
         return result
 
 
 def calculate(request):
     if request.method == 'POST':
+        basewidth = float(request.POST.get('bottom_width'))
+        slope1 = float(request.POST.get('z1'))
+        slope2 = float(request.POST.get('z2'))
         height = float(request.POST.get('water_depth'))
         cslope = float(request.POST.get('channel_slope'))
         channelType = request.POST.get('channel_type')
         mc = float(request.POST.get('n'))
 
-        try:
-            basewidth = float(request.POST.get('bottom_width'))
-        except:
-            basewidth = 0
-
-        try:
-            slope1 = float(request.POST.get('z1'))
-            slope2 = float(request.POST.get('z2'))
-        except:
-            slope1 = 0
-            slope2 = 0
-
 
     a = Openchannalflow(basewidth,height,slope1,slope2,cslope,mc)
-    if channelType == 'Trapezoid':
-        result =  a.Trapezoid()
-    elif channelType == 'Rectangle':
-        result =  a.Rectangle()
-    elif channelType == 'Triangle':
-        result =  a.Triangle()
-    
-    return render(request,'opencf.html',result)
+    # # if channelType == 'Trapezoid':
+    result =  a.Trapezoid()
 
+    # context = {'result':result}
     
-    
-   
+    # return render(request,'opencf.html',context)
 
-# To Check error
+
     # try:
     #         # basewidth = float(basewidth) 
     #         slope1 = float(slope1) 
@@ -111,7 +98,15 @@ def calculate(request):
     #         # 'bottom_width': basewidth,
     #     , safe=False )
 
+    return render(request,'opencf.html',result)
+def pipe_calculation(request):
+    if request.method == 'POST':
+        diameter = float(request.POST.get('pipe_diameter'))
+        len = float(request.POST.get('pipe_length'))
+        pm = float(request.POST.get('roughness_coefficient'))
+        pf = float(request.POST.get('flr'))
 
+        return render(request,'fl.html',"")
     # JsonResponse({'error': 'Invalid request method'}, status=405)
 
 

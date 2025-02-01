@@ -5,10 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Open Channel Flow Calculator</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+    {% load static %}
     <style>
         body {
             background-color: #f8f9fa;
-            font-family: Ariral, sans-serif;
+            font-family: Arial, sans-serif;
         }
         .header {
             font-family: 'Times New Roman', Times, serif;
@@ -29,7 +30,12 @@
         }
         .result-field {
             background-color: #e9ecef;
-            border: none;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+        }
+        .hidden {
+            display: none;
         }
     </style>
 </head>
@@ -37,148 +43,269 @@
     <div class="header">
         <h1>Open Channel Flow Calculator</h1>
     </div>
+    <a href="{% url 'index' %}" class="btn btn-primary">Home</a>
 
     <div class="container form-container">
-        <form method="post" action="{% url 'calculate' %}">
+        <div class="image-container">
+            <img src="{% static '/cweb.jpg' %}" alt="Descriptive Alt Text" class="img-fluid">
+        </div>
+        <form id="flowForm" method="post" action="{% url 'calculate' %}"target="_blank">
             {% csrf_token %}
             
-            <div class="mb-3">
-                <label for="channelType" class="form-label">Select Channel Type</label>
-                <select class="form-select" id="channelType" name="channel_type">
-                    <option value="Trapezoid" selected>Trapezoid</option>
-                    <option value="Triangle">Triangle</option>
-                    <option value="Rectangle">Rectangle</option>
-                    {% comment %} <option value="circle">Circle</option> {% endcomment %}
-                </select>
+            <div class="row"> 
+                <div class="col-md-6 mb-3">
+                    <label for="channelType" class="form-label">Select Channel Type</label>
+                    <select class="form-select" id="channelType" name="channel_type">
+                        <option value="Trapezoid" selected>Trapezoid</option>
+                        <option value="Triangle">Triangle</option>
+                        <option value="Rectangle">Rectangle</option>
+                        <option value="circle">Circle</option> 
+                    </select>
+                </div>
+            
+                <div class="col-md-6 mb-3">
+                    <label for="calculationType" class="form-label">Select Parameter for Solving</label>
+                    <select class="form-select" id="calculationType" name="calculation_type">
+                        <option value="velocity_discharge" selected>Velocity (V) & Discharge (Q)</option>
+                        <option value="channel_slope_v">Channel Slope from V</option>
+                        <option value="channel_slope_q">Channel Slope from Q</option>
+                        <option value="manning_v">Manning Coefficient from V</option>
+                        <option value="manning_q">Manning Coefficient from Q</option>
+                        <option value="depth_q">Depth from Q</option>
+                    </select>
+                </div>
             </div>
-
-            <div class="mb-3">
-                <label for="calculationType" class="form-label">Select Parameter for Solving</label>
-                <select class="form-select" id="calculationType" name="calculation_type">
-                    <option value="velocity_discharge" selected>Velocity (V) & Discharge (Q)</option>
-                    <option value="channel_slope_v">Channel Slope from V</option>
-                    <option value="channel_slope_q">Channel Slope from Q</option>
-                    <option value="manning_v">Manning Coefficient from V</option>
-                    <option value="manning_q">Manning Coefficient from Q</option>
-                    <option value="depth_q">Depth from Q</option>
-                </select>
-            </div>
-
-            <div class="mb-3">
+            
+            <div class="row">
                 <label for="unitSystem" class="form-label">Select Unit System</label>
-                <select class="form-select" id="unitSystem" name="unit_system" onchange="updatePlaceholders()">
-                    <option value="ft" selected>Feet (ft)</option>
-                    <option value="m">Meter (m)</option>
-                </select>
+                <div class="col-md-3 mb-3">
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="unit_system" id="unitSystemFt" value="ft" checked onchange="updatePlaceholders()">
+                        <label class="form-check-label" for="unitSystemFt">
+                            Feet (ft)
+                        </label>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="unit_system" id="unitSystemM" value="m" onchange="updatePlaceholders()">
+                        <label class="form-check-label" for="unitSystemM">
+                            Meter (m)
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="row" id="zInputsRow">
+                    <div class="col-md-6 mb-3">
+                        <label for="z1" class="form-label">Z1 (Trapezoid and triangle only):</label>
+                        <input type="number" class="form-control z-input" step="0.01" name="z1" id="z1" data-name="Z1" required>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="z2" class="form-label">Z2 (Trapezoid and triangle only):</label>
+                        <input type="number" class="form-control z-input" step="0.01" name="z2" id="z2" data-name="Z2" required>
+                    </div>
+                </div>
             </div>
 
             <div class="row">
                 <div class="col-md-6 mb-3">
-                    <label for="z1" class="form-label">Z1 (Trapezoid and triangle only):</label>
-                    <input type="number" class="form-control" step="0.01" name="z1" id="z1" class="z-input" data-name="Z1">
-                </div>
-                <div class="col-md-6 mb-3">
-                    <label for="z2" class="form-label">Z2 (Trapezoid and triangle only):</label>
-                    <input type="number" class="form-control" step="0.01" name="z2" id="z2" class="z-input" data-name="Z2">
-                </div>
-            
-                
-        
-                <div class="col-md-6 mb-3">
                     <label for="channelSlope" class="form-label">Channel Slope</label>
-                    <input type="number"step="0.01" class="form-control" id="channelSlope" name="channel_slope" placeholder="Slope in ft/ft">
+                    <input type="number" step="0.01" class="form-control" id="channelSlope" name="channel_slope" placeholder="Slope in ft/ft" required>
                 </div>
                 <div class="col-md-6 mb-3">
                     <label for="waterDepth" class="form-label">Water Depth</label>
-                    <input type="number"step="0.01" class="form-control" id="waterDepth" name="water_depth" placeholder="Depth in ft">
+                    <input type="number" step="0.01" class="form-control" id="waterDepth" name="water_depth" placeholder="Depth in ft" required>
                 </div>
             </div>
 
             <div class="row">
                 <div class="col-md-6 mb-3">
                     <label for="bottomWidth" class="form-label">Bottom Width</label>
-                    <input type="number" step="0.01"class="form-control" id="bottomWidth" name="bottom_width" placeholder="Width in ft">
+                    <input type="number" step="0.01" class="form-control" id="bottomWidth" name="bottom_width" placeholder="Width in ft" required>
                 </div>
-                <!-- <div class="col-md-6 mb-3">
-                    <label for="flowDischarge" class="form-label">Flow Discharge</label>
-                    <input type="number" class="form-control" id="flowDischarge" name="flow_discharge" placeholder="Discharge in ft³/s">
-                </div> -->
+                
+                <div class="col-md-6 mb-3">
+                    <label for="velocity" class="form-label">Velocity</label>
+                    <input name ="fv" type="number" step="0.01" class="form-control" id="velocity" name="velocity" placeholder="Velocity in ft/sec" required>
+                </div>
+            
+            
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    
+                    <label for="flow" class="form-label">Flow</label>
+                    <input name ="fd" type="number" step="0.01" class="form-control" id="flow" name="flow" placeholder="Discharge in ft³/sec" required>
+                </div>
+            
+        
+
+            <div class="col-md-6 mb-3">
+                <label for="n">Manning's Coefficient (n):</label>
+                <select name="n" id="n" required>
+                    <option value="0.014">Clean, uncoated cast iron (n = 0.014)</option>
+                    <option value="0.013">Clean, coated cast iron (n = 0.013)</option>
+                    <option value="0.025">Dirty, tuberculed cast iron (n = 0.015-0.035)</option>
+                    <option value="0.016">Riveted steel (n = 0.015-0.017)</option>
+                    <option value="0.011">Brass and glass (n = 0.009-0.013)</option>
+                    <option value="0.023">Firm gravel (n = 0.023)</option>
+                    <option value="0.060">Very poor natural channels (n = 0.060)</option>
+                </select><br><br>
             </div>
-            <!-- <h1>Manning's Equation Calculator</h1> -->
-    <form id="flowForm">
-        <!-- <label for="slope">Channel Slope:</label>
-        <input type="number" step="0.0001" name="slope" id="slope" required data-unit="ft/ft" data-name="Slope"><br><br> -->
-
-        <label for="n">Manning's Coefficient (n):</label>
-        <select name="n" id="n" required>
-            <option value="0.014">Clean, uncoated cast iron (n = 0.014)</option>
-            <option value="0.013">Clean, coated cast iron (n = 0.013)</option>
-            <option value="0.025">Dirty, tuberculed cast iron (n = 0.015-0.035)</option>
-            <option value="0.016">Riveted steel (n = 0.015-0.017)</option>
-            <option value="0.011">Brass and glass (n = 0.009-0.013)</option>
-            <option value="0.023">Firm gravel (n = 0.023)</option>
-            <option value="0.060">Very poor natural channels (n = 0.060)</option>
-            <!-- Add more options as needed -->
-         </select><br><br> 
-         
-
-            {% comment %} <div class="mb-3">
-                <label for="manningN" class="form-label">Manning's n Value</label>
-                <input type="text" class="form-control" id="manningN" name="manning_n" placeholder="Enter Manning's n">
-            </div> {% endcomment %}
+        </div>
 
             <div class="text-center">
-                <button type="submit"  onclick="location.href='calculate/" class="btn btn-primary">Calculate</button>
-                <button type="reset" class="btn btn-secondary">Reset</button>
+                <button type="submit" class="btn btn-primary">Calculate</button>
+                <button type="reset" class="btn btn-secondary" onclick="handleReset()">Reset</button>
             </div>
 
             <div class="mt-3">
-                <div  value="Calculate">
+                <div class="row">
                     <div class="col-md-6 mb-3">
-                        <label  class="form-label">flow_area:</label>
-                        <div class="form-control"> {{flow_area}} </div>
+                        <label for="flow-area" class="form-label">Flow Area:</label>
+                        <input  type="number" step="0.01" class="form-control bg-light text-dark border-0" id="flow-area" name="flow-area"  >
+                   
+                        
                     </div>
                     <div class="col-md-6 mb-3">
-                        <label  class="form-label">wetted_perimeter:</label>
-                        <div class="form-control">  {{wetted_perimeter}}</div>
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label  class="form-label"> hydraulic_radius:</label>
-                        <div class="form-control"> {{hydraulic_radius}} </div>
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label  class="form-label"> topwidth:</label>
-                        <div class="form-control">  {{topwidth}} </div>
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label  class="form-label">hydraulic_depth:</label>
-                        <div class="form-control">  {{hydraulic_depth}} </div>
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label  class="form-label">velocity:</label>
-                        <div class="form-control"> {{velocity}} </div>
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label  class="form-label">flow:</label>
-                        <div class="form-control"> {{flow}} </div>
-                    </div>
-   
+                        <label for="w-p" class="form-label">Wetted Perimeter:</label>
+                        <input  type="number" step="0.01" class="form-control bg-light text-dark border-0" id="w-p" name="w-p"  >
+                   
+                        </div>
                 </div>
+                <div class="row ">
+                    <div class="col-md-6 mb-3">
+                        <label for="h-r" class="form-label">hydraulic radius:</label>
+                        <input  type="number" step="0.01" class="form-control bg-light text-dark border-0" id="h-r" name="h-r"  >
+                   
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="t-w" class="form-label">Top Width:</label>
+                            <input  type="number" step="0.01" class="form-control bg-light text-dark border-0" id="t-w" name="t-w"  >
+                       
+                            </div>
+                       
+                
             </div>
         </form>
     </div>
 
     <script>
+        
         function updatePlaceholders() {
-            const unitSystem = document.getElementById("unitSystem").value;
+            const unitSystem = document.querySelector('input[name="unit_system"]:checked').value;
 
             document.getElementById("channelSlope").placeholder = `Slope in ${unitSystem === 'm' ? 'm/m' : 'ft/ft'}`;
             document.getElementById("waterDepth").placeholder = `Depth in ${unitSystem}`;
             document.getElementById("bottomWidth").placeholder = `Width in ${unitSystem}`;
-            document.getElementById("flowDischarge").placeholder = `Discharge in ${unitSystem === 'm' ? 'm³/s' : 'ft³/s'}`;
+            document.getElementById("flow").placeholder = `Discharge in ${unitSystem === 'm' ? 'm³/s' : 'ft³/s'}`;
+            document.getElementById("velocity").placeholder = `Velocity in ${unitSystem === 'm' ? 'm/s' : 'ft/s'}`;
         }
+
+        function toggleZInputs() {
+            const channelType = document.getElementById('channelType').value;
+            const zInputsRow = document.getElementById('zInputsRow');
+            const z1Input = document.getElementById('z1');
+            const z2Input = document.getElementById('z2');
+
+            if (channelType === 'circle'|| channelType === 'Rectangle') {
+                zInputsRow.classList.add('hidden');
+                z1Input.removeAttribute('required');
+                z2Input.removeAttribute('required');
+            } else {
+                zInputsRow.classList.remove('hidden');
+                z1Input.setAttribute('required', '');
+                z2Input.setAttribute('required', '');
+            }
+        }
+
+        function toggleVelocityFlowFields() {
+            const calculationType = document.getElementById('calculationType').value;
+            const velocityField = document.getElementById('velocity');
+            const flowField = document.getElementById('flow');
+            const channelSlopeField = document.getElementById('channelSlope');
+            const nField = document.getElementById('n');    
+            const bottomWidthField = document.getElementById('bottomWidth');
+            const waterDepthField = document.getElementById('waterDepth');
+            const z1Field = document.getElementById('z1');
+            const z2Field = document.getElementById('z2');  
+            const flowAreaField = document.getElementById('flow-area');
+            const wPField = document.getElementById('w-p');
+            const hRField = document.getElementById('h-r');
+            const tWField = document.getElementById('t-w');
+
+
+            // Reset fields
+            velocityField.disabled = false;
+            flowField.disabled = false;
+            channelSlopeField.disabled = false;
+            z1Field.value="{{ z1 }}";
+            z2Field.value="{{ z2 }}";
+            bottomWidthField.value="{{ bottom_width }}";
+            waterDepthField.value="{{ water_depth }}";
+            flowAreaField.value="{{ flow_area }}";
+            wPField.value="{{ wetted_perimeter }}";
+            hRField.value="{{ hydraulic_radius }}";
+            tWField.value="{{ top_width }}";
+            channelSlopeField.value = "{{ channel_slope }}";
+            
+            switch(calculationType) {
+                case 'velocity_discharge':
+                    velocityField.disabled = true;
+                    flowField.disabled = true;
+                    flowField.value = "{{ flow }}";
+                    velocityField.value = "{{ velocity }}";
+                    break;
+                case 'channel_slope_v':
+                    flowField.disabled = true;
+                    channelSlopeField.disabled = true;
+                    flowField.value = "{{ flow }}";
+                    channelSlopeField.value = "{{ channel_slope }}";
+                    break;
+                case 'channel_slope_q':
+                    velocityField.disabled = true;
+                    channelSlopeField.disabled = true;
+                    velocityField.value = "{{ velocity }}";
+                    channelSlopeField.value = "{{ channel_slope }}";
+                    break;
+                case 'manning_v':
+                    flowField.disabled = true;
+                    flowField.value = "{{ flow }}";
+                    break;
+                case 'manning_q':
+                    velocityField.disabled = true;
+                    velocityField.value = "{{ velocity }}";
+                    break;
+                case 'depth_q':
+                    velocityField.disabled = true;
+                    velocityField.value = "{{ velocity }}";
+                    break;
+            }
+        }
+
+        function handleReset() {
+            const form = document.getElementById('flowForm');
+            form.reset();
+            toggleZInputs();
+            toggleVelocityFlowFields();
+            updatePlaceholders();
+        }
+
+        function showLastFiveInputs() {
+            const lastFiveInputs = document.querySelectorAll('.form-control:not(.hidden)');
+            lastFiveInputs.forEach(input => input.classList.remove('hidden'));
+        }
+
+        // Initialize event listeners
+        document.getElementById('channelType').addEventListener('change', toggleZInputs);
+        document.getElementById('calculationType').addEventListener('change', toggleVelocityFlowFields);
+        document.getElementById('flowForm').addEventListener('click', showLastFiveInputs);
         
+        // Initial setup
+        toggleZInputs();
+        toggleVelocityFlowFields();
     </script>
 </body>
 </html>
-
