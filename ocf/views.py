@@ -99,14 +99,7 @@ def calculate(request):
     #     , safe=False )
 
     return render(request,'opencf.html',result)
-def pipe_calculation(request):
-    if request.method == 'POST':
-        diameter = float(request.POST.get('pipe_diameter'))
-        len = float(request.POST.get('pipe_length'))
-        pm = float(request.POST.get('roughness_coefficient'))
-        pf = float(request.POST.get('flr'))
 
-        return render(request,'fl.html',"")
     # JsonResponse({'error': 'Invalid request method'}, status=405)
 
 

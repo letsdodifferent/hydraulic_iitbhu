@@ -1,5 +1,5 @@
 from django.contrib import admin
-from django.urls import path
+from django.urls import path,include
 from . import views
 
 urlpatterns = [
@@ -8,7 +8,6 @@ urlpatterns = [
     path('opencf.html/',views.oc,name='oc'),
     path('fl.html/',views.fl,name='fl'),
     path('calculate/',views.calculate,name='calculate'),
-    path('pipe_calculation/',views.pipe_calculation,name='pipe_calculation'),
-
+    path('pipe/',include('pipe.urls'))
 ]
 
