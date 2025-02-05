@@ -58,8 +58,8 @@
 </head>
 <body>
     <div class="container form-container">
-        <h1 class="text-center">Water Shed delineation</h1>
-        <form id="pipeForm" method="POST" action="{% url 'pipe_calculation' %}">
+        <title>Watershed Delineation</title>
+        <form id="pipeForm" method="POST" action="{% url 'wsd' %}">
             {% csrf_token %}
         
             <div class="form-group">
@@ -76,15 +76,26 @@
             </div>
            
             
+            <div id="results">
+                {% if plot_data %}
+                    <h2>Results</h2>
+                    <div class="plot-container">
+                        <h3>Digital Elevation Model</h3>
+                        <img src="{{ plot_data.dem_url }}" class="plot-img">
+                    </div>
+                    
+                    <div class="plot-container">
+                        <h3>Flow Direction</h3>
+                        <img src="{{ plot_data.fdir_url }}" class="plot-img">
+                    </div>
+                    
+                    <div class="plot-container">
+                        <h3>Catchment Area</h3>
+                        <img src="{{ plot_data.catchment_url }}" class="plot-img">
+                    </div>
+                {% endif %}
         </form>
-        {% if images %}
-    <h2>Generated Images</h2>
-    <div class="image-container">
-        <img src="{{ images[0] }}" alt="Image 1">
-        <img src="{{ images[1] }}" alt="Image 2">
-        <img src="{{ images[2] }}" alt="Image 3">
-    </div>
-{% endif %}
+      
         
 
         
@@ -98,3 +109,4 @@
     </script>
 </body>
 </html>
+
