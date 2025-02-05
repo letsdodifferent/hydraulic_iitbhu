@@ -1,8 +1,8 @@
 from django.contrib import admin
-from django.urls import path,include
+from django.urls import path, include
 from . import views
 
 urlpatterns = [
-    path('',views.main,name='main'),
-    # path('',views.,name=''),
+    path('', views.main, name='main'),
+    path('generate_image/', views.wsd, name='wsd'),
 ]
