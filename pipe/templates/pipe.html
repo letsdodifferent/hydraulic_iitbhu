@@ -7,7 +7,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pipe Calculation</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -52,6 +52,17 @@
             border-color: #004085;
         }
     </style>
+
+    <script>
+        function resetForm() {
+            document.getElementById("pipeForm").reset();
+            document.getElementById("roughnessCoefficient").value = "";
+            document.getElementById("flow_rate").value = "";
+            document.getElementById("pipeDiameter").value = "";
+            document.getElementById("pipeLength").value = "";
+            document.getElementById("frictionloss").value = "";
+        }
+    </script>
 </head>
 <body>
     <div class="container form-container">
@@ -69,28 +80,28 @@
             </div>
             <div class="form-group">
                 <label for="roughnessCoefficient">Pipe Roughness Coefficient</label>
-                <input type="text" class="form-control" id="roughnessCoefficient" name="roughness_coefficient" readonly>
+                <input type="text" class="form-control" id="roughnessCoefficient" name="roughness_coefficient" required value="{{ roughness_coefficient|default:''  }}">
             </div>
             <div class="form-group">
                 <label for="flow_rate">flow rate (in cubic meters per sec)</label>
-                <input type="number" step="0.01" class="form-control" id="flow_rate" name="flr" required>
+                <input type="number" step="0.01" class="form-control" id="flow_rate" name="flr" required value="{{ flow_rate|default:''  }}">
             </div>
             <div class="form-group">
                 <label for="pipeDiameter">Pipe Diameter (in meters)</label>
-                <input type="number" step="0.01" class="form-control" id="pipeDiameter" name="pipe_diameter" required>
+                <input type="number" step="0.01" class="form-control" id="pipeDiameter" name="pipe_diameter" required value="{{ pipe_diameter|default:''  }}">
             </div>
             
             <div class="form-group">
                 <label for="pipeLength">Pipe Length (in meters)</label>
-                <input type="number" step="0.01" class="form-control" id="pipeLength" name="pipe_length" required>
+                <input type="number" step="0.01" class="form-control" id="pipeLength" name="pipe_length" required value="{{ pipe_length|default:''  }}">
             </div>
             <div class="text-center">
                 <button type="submit" class="btn btn-primary">Calculate</button>
-                <button type="reset" class="btn btn-secondary">Reset</button>
+                <button type="button" class="btn btn-secondary" onclick="resetForm()">Reset</button>
             </div>
             <div class="form-group">
                 <label for="frictionloss">friction loss (in meters)</label>
-                <input type="number" step="0.01" class="form-control" id="frictionloss" name="friction_loss" required>
+                <input type="number" step="0.01" class="form-control" id="frictionloss" name="friction_loss" readonly value="{{ friction_loss|default:''  }}">
             </div>
         </form>
        
@@ -121,10 +132,16 @@
                     roughnessCoefficient.value = '';
             }
         }
+        
+        
+        
+        
+
 
         document.addEventListener('DOMContentLoaded', function() {
             selectRoughnessCoefficient();
         });
+
     </script>
 </body>
 </html>

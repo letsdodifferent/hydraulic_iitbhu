@@ -16,8 +16,12 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from . import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('',include('ocf.urls'))
+    path('',views.index,name='index'),
+    path('opencf/',include('ocf.urls')),
+    path('pipe/',include('pipe.urls')),
+    path('wsd/',include('wsd.urls')),
 ]

@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hydraulic and Hydrology Applications</title>
+    <link rel="icon" type="image/x-icon" href="../static/favicon.ico">
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Times New Roman', Times, serif, sans-serif;
+            background: linear-gradient(to bottom, #cce7ff, #00509e);
+            background-image: url('../static/water.gif');
+            color: #fff;
+            text-align: center;
+        }
+
+        header {
+            padding: 50px;
+            background: rgba(0, 80, 158, 0.8);
+            /* display: flex; */
+            /* align-items: center; */
+            /* justify-content: space-between; */
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+        }
+        .image{
+            display: flex;
+            justify-content: space-evenly;
+            align-items: center;
+        }
+        header img {
+            height: 170px;     
+        }
+
+        h1 {
+            height: 60px;
+            padding: 20px;
+            flex-grow: 1;
+            text-align: center;
+            align-items: center;
+            font-size: 2.5rem;
+            border: 2px solid black;
+            background: rgba(0, 0, 0, 0.5);
+        }
+
+        main {
+            display: flex;
+            justify-content: space-evenly;
+            margin: 200px 50px;
+            padding: 20px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        section {
+            font-size: 2.2rem;
+            width: 45%;
+        }
+
+        section h2 {
+            border: 1.5px solid #000;
+            background-color: black;
+            padding: 10px;
+            font-size: 2rem;
+            /* text-decoration: underline; */
+            border-radius: 70%;
+            margin-bottom: 20px;
+        }
+
+        button {
+            display: block;
+            width: 90%;
+            margin: 10px auto;
+            padding: 10px;
+            background-color: #0073e6;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #005bb5;
+        }
+
+        footer {
+            margin-top: 50px;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div>
+            <div class="image">
+        <!-- <img src="../static/mobileheader.jpg" > -->
+        <img src="../static/iitbhulogo.png" >
+        <img src="../static/iit_emblem_original.jpg" >
+    </header>
+</div>
+
+<h1>Welcome to Our Web-Based Computations for Hydraulic and Hydrology Applications</h1>
+</div>
+    <main>
+    
+        <section>
+            <h2>Hydraulic</h2>
+            <button onclick="location.href='opencf'">Open Channel Flow</button>
+            <button onclick="location.href='pipe'">friction head loss</button>
+            <button onclick="location.href='turbulence.html'">Turbulence</button>
+            <button>Button 4</button>
+            <button>Button 5</button>
+            <button>Button 6</button>
+        </section>
+        <section>
+            <h2>Hydrology</h2>
+            <button onclick="location.href='wsd'">Ground Water</button>
+            <button onclick="location.href='surface_water.html'">Surface Water</button>
+            <button>Button 3</button>
+            <button>Button 4</button>
+            <button>Button 5</button>
+            <button>Button 6</button>
+        </section>
+    </main>
+    <footer>
+        <p>&copy; 2025 Hydraulic and Hydrology Team</p>
+    </footer>
+</body>
+</html>
