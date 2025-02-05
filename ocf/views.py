@@ -48,9 +48,9 @@ class Openchannalflow:
 
     def Triangle(self):
         A = 0.5*(self.z1 + self.z2)*(self.y**2)
-        P = 2*self.y*(math.sqrt(1+self.m*self.m))
+        P = self.y*(math.sqrt(1+self.z1**2) + math.sqrt(1+self.z2**2))
         R = A/P
-        t = 2*self.m*self.y
+        t = self.z1*self.y + self.z2*self.y
         D=A/t
         self.different_calculations(R,A)        
         result = {'z1':self.z1,'z2':self.z2,'bottom_width':self.b,'water_depth':self.y,'channel_slope':self.s,'flow_area':A,"wetted_perimeter":P,"hydraulic_radius":R,"topwidth":t,"hydraulic_depth":D,"velocity":self.V,"flow":self.Q}
