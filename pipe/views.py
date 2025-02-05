@@ -3,20 +3,20 @@ from django.http import HttpResponse
 from django.http import JsonResponse
 # Create your views here.
 
-class pipe:
-    def __init__(self,diameter=0,length=0,roughness=0,flr=0):
+
+def page(request):
+    return render(request,"pipe.html")
+
+class pipefriction:
+    def __init__(self,diameter=0,length=0,roughness=0,flow_rate=0):
         self.d = diameter
         self.l = length
         self.pm = roughness
-        self.pf = flr
+        self.pf = flow_rate
 
-    def pipe_calculation(self):
-        A = 3.14159*(self.d**2)/4
-        P = 3.14159*self.d
-        R = A/P
-        V = 1.318*(self.pf**0.5)*(R**0.63)*(self.pm**0.54)
-        Q = A*V
-        result = {'diameter':self.d,'length':self.l,'roughness':self.pm,'flow_rate':self.pf,'flow_area':A,"wetted_perimeter":P,"hydraulic_radius":R,"velocity":V,"flow":Q}
+    def calculation(self):
+        friction_loss = 10.44 * self.l * (self.pf/self.pm)**1.85 * (1/self.d**4.8655)
+        result = {'diameter':self.d,'length':self.l,'roughness':self.pm,'flow_rate':self.pf,'friction_loss':friction_loss}
         return result
 
 
@@ -25,9 +25,22 @@ class pipe:
 
 def pipe_calculation(request):
     if request.method == 'POST':
-        diameter = float(request.POST.get('pipe_diameter'))
-        len = float(request.POST.get('pipe_length'))
-        pm = float(request.POST.get('roughness_coefficient'))
-        pf = float(request.POST.get('flr'))
+        pipe_diameter = float(request.POST.get('pipe_diameter'))
+        pipe_length = float(request.POST.get('pipe_length'))
+        roughness_coefficient = float(request.POST.get('roughness_coefficient'))
+        flow_rate = float(request.POST.get('flr'))
 
-        return render(request,'fl.html',"")
+        object = pipefriction(pipe_diameter,pipe_length,roughness_coefficient,flow_rate)
+        result = object.calculation()
+
+        context = {
+            'pipe_diameter': pipe_diameter,
+            'pipe_length': pipe_length,
+            'roughness_coefficient': roughness_coefficient,
+            'flow_rate': flow_rate,
+            'friction_loss': result['friction_loss']
+        }
+
+        return render(request, 'pipe.html', context)
+
+    return render(request, 'pipe.html')
