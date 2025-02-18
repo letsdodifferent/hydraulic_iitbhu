@@ -1,19 +1,9 @@
- 
-
 <!DOCTYPE html>
 <html lang="en">
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
-    <a class="navbar-brand" href="/">Home</a>
-</nav>
-<!DOCTYPE html>
-<html lang="en">
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
-    <a class="navbar-brand" href="/">Home</a>
-</nav>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>water shed delineation</title>
+    <title>Watershed Delineation</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <style>
         body {
@@ -59,169 +49,88 @@
             border-color: #004085;
         }
     </style>
-
-      
 </head>
 <body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="/">Home</a>
+    </nav>
     <div class="container form-container">
-        <title>Watershed Delineation</title>
-        <form id="pipeForm" method="POST" action="{% url 'wsd' %}">
+        <form id="wsdForm" method="POST" action="{% url 'wsd' %}">
             {% csrf_token %}
-        
             <div class="form-group">
-                <label for="latitude">latitude</label>
-                <input type="number" step="0.01" class="form-control" id="latitude" name="lat">
+                <label for="latitude">Latitude</label>
+                <input type="number" step="0.01" class="form-control" id="latitude" name="lat" required>
             </div>
             <div class="form-group">
-                <label for="longitude">longitude</label>
-                <input type="number" step="0.01" class="form-control" id="longitude" name="long">
+                <label for="longitude">Longitude</label>
+                <input type="number" step="0.01" class="form-control" id="longitude" name="long" required>
             </div>
             <div class="text-center">
                 <button type="submit" class="btn btn-primary">Calculate</button>
                 <button type="button" class="btn btn-secondary" onclick="resetForm()">Reset</button>
             </div>
-           
-            
-            <div id="results">
-                {% if plot_data %}
+        </form>
+        <div id="results" class="result">
+            {% if plot_data %}
+                <h2>Results</h2>
+                <div class="plot-container">
+                    <h3>Digital Elevation Model</h3>
+                    <img src="{{ plot_data.dem_url }}" class="plot-img">
+                </div>
+                <div class="plot-container">
+                    <h3>Flow Direction</h3>
+                    <img src="{{ plot_data.fdir_url }}" class="plot-img">
+                </div>
+                <div class="plot-container">
+                    <h3>Catchment Area</h3>
+                    <img src="{{ plot_data.catchment_url }}" class="plot-img">
+                </div>
+            {% endif %}
+        </div>
+    </div>
+    <script>
+        document.getElementById('wsdForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent the default form submission
+
+            const form = event.target;
+            const formData = new FormData(form);
+
+            fetch(form.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRFToken': formData.get('csrfmiddlewaretoken')
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Handle the response data
+                const resultsDiv = document.getElementById('results');
+                resultsDiv.innerHTML = `
                     <h2>Results</h2>
                     <div class="plot-container">
                         <h3>Digital Elevation Model</h3>
-                        <img src="{{ plot_data.dem_url }}" class="plot-img">
+                        <img src="${data.dem_url}" class="plot-img">
                     </div>
-                    
                     <div class="plot-container">
                         <h3>Flow Direction</h3>
-                        <img src="{{ plot_data.fdir_url }}" class="plot-img">
+                        <img src="${data.fdir_url}" class="plot-img">
                     </div>
-                    
                     <div class="plot-container">
                         <h3>Catchment Area</h3>
-                        <img src="{{ plot_data.catchment_url }}" class="plot-img">
+                        <img src="${data.catchment_url}" class="plot-img">
                     </div>
-                {% endif %}
-        </form>
-      
-        
+                `;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        });
 
-        
-    </div>
-
-    <script>
         function resetForm() {
-        document.getElementById('latitude').value = '';
-        document.getElementById('longitude').value = '';
-    }
+            document.getElementById('latitude').value = '';
+            document.getElementById('longitude').value = '';
+        }
     </script>
 </body>
 </html>
-
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>water shed delineation</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f8f9fa;
-            margin: 20px;
-        }
-        .form-container {
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            margin-top: 20px;
-        }
-        .form-group {
-            margin-bottom: 15px;
-        }
-        label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-        }
-        input, select {
-            width: 100%;
-            padding: 8px;
-            box-sizing: border-box;
-            border: 1px solid #ced4da;
-            border-radius: 0.25rem;
-        }
-        .result {
-            margin-top: 20px;
-            padding: 10px;
-            background-color: #e9ecef;
-            border: 1px solid #ced4da;
-            border-radius: 0.25rem;
-        }
-        .btn-primary {
-            background-color: #007bff;
-            border-color: #007bff;
-        }
-        .btn-primary:hover {
-            background-color: #0056b3;
-            border-color: #004085;
-        }
-    </style>
-
-      
-</head>
-<body>
-    <div class="container form-container">
-        <title>Watershed Delineation</title>
-        <form id="pipeForm" method="POST" action="{% url 'wsd' %}">
-            {% csrf_token %}
-        
-            <div class="form-group">
-                <label for="latitude">latitude</label>
-                <input type="number" step="0.01" class="form-control" id="latitude" name="lat">
-            </div>
-            <div class="form-group">
-                <label for="longitude">longitude</label>
-                <input type="number" step="0.01" class="form-control" id="longitude" name="long">
-            </div>
-            <div class="text-center">
-                <button type="submit" class="btn btn-primary">Calculate</button>
-                <button type="button" class="btn btn-secondary" onclick="resetForm()">Reset</button>
-            </div>
-           
-            
-            <div id="results">
-                {% if plot_data %}
-                    <h2>Results</h2>
-                    <div class="plot-container">
-                        <h3>Digital Elevation Model</h3>
-                        <img src="{{ plot_data.dem_url }}" class="plot-img">
-                    </div>
-                    
-                    <div class="plot-container">
-                        <h3>Flow Direction</h3>
-                        <img src="{{ plot_data.fdir_url }}" class="plot-img">
-                    </div>
-                    
-                    <div class="plot-container">
-                        <h3>Catchment Area</h3>
-                        <img src="{{ plot_data.catchment_url }}" class="plot-img">
-                    </div>
-                {% endif %}
-        </form>
-      
-        
-
-        
-    </div>
-
-    <script>
-        function resetForm() {
-        document.getElementById('latitude').value = '';
-        document.getElementById('longitude').value = '';
-    }
-    </script>
-</body>
-</html>
-
-=======
->>>>>>> origin/main

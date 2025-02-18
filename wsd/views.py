@@ -101,8 +101,8 @@ class Watershed_delineation():
         self.long = long
         from pysheds.grid import Grid
 
-        grid = Grid.from_raster(r"C:\Users\aryan\OneDrive\Documents\Coading\Django\ug_project\ug\wsd\static\output_SRTMGL1.tif")
-        dem = grid.read_raster(r"C:\Users\aryan\OneDrive\Documents\Coading\Django\ug_project\ug\wsd\static\output_SRTMGL1.tif")
+        grid = Grid.from_raster(r"/home/nextlevel/Downloads/local-server/pythoncoding/Hydraulics/wsd/static/output_SRTMGL1.tif")
+        dem = grid.read_raster(r"/home/nextlevel/Downloads/local-server/pythoncoding/Hydraulics/wsd/static/output_SRTMGL1.tif")
 
         #%%
         import numpy as np

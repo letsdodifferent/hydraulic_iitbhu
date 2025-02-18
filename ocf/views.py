@@ -31,7 +31,12 @@ class Openchannalflow:
         R = A/P
         D=A/t       
         self.different_calculations(R,A) 
-        result = {'z1':self.z1,'z2':self.z2,'bottom_width':self.b,'water_depth':self.y,'channel_slope':self.s,'flow_area':A,"wetted_perimeter":P,"hydraulic_radius":R,"topwidth":t,"hydraulic_depth":D,"velocity":self.V,"flow":self.Q}
+        result = {
+            'z1': f"{self.z1:.4f}", 'z2': f"{self.z2:.4f}", 'bottom_width': f"{self.b:.4f}", 'water_depth': f"{self.y:.4f}",
+            'channel_slope': f"{self.s:.4f}", 'flow_area': f"{A:.4f}", "wetted_perimeter": f"{P:.4f}", "hydraulic_radius": f"{R:.4f}",
+            "topwidth": f"{t:.4f}", "hydraulic_depth": f"{D:.4f}", "velocity": f"{self.V:.4f}", "flow": f"{self.Q:.4f}"
+        }
+        # result = {'z1':self.z1,'z2':self.z2,'bottom_width':self.b,'water_depth':self.y,'channel_slope':self.s,'flow_area':A,"wetted_perimeter":P,"hydraulic_radius":R,"topwidth":t,"hydraulic_depth":D,"velocity":self.V,"flow":self.Q}
         return result
 
 
@@ -42,7 +47,13 @@ class Openchannalflow:
         t = self.b
         D=A/t
         self.different_calculations(R,A)
-        result = {'bottom_width':self.b,'water_depth':self.y,'channel_slope':self.s,'flow_area':A,"wetted_perimeter":P,"hydraulic_radius":R,"topwidth":t,"hydraulic_depth":D,"velocity":self.V,"flow":self.Q}
+        result = {
+            'bottom_width': f"{self.b:.4f}", 'water_depth': f"{self.y:.4f}", 'channel_slope': f"{self.s:.4f}", 'flow_area': f"{A:.4f}",
+            "wetted_perimeter": f"{P:.4f}", "hydraulic_radius": f"{R:.4f}", "topwidth": f"{t:.4f}", "hydraulic_depth": f"{D:.4f}",
+            "velocity": f"{self.V:.4f}", "flow": f"{self.Q:.4f}"
+        }
+        
+        # result = {'bottom_width':self.b,'water_depth':self.y,'channel_slope':self.s,'flow_area':A,"wetted_perimeter":P,"hydraulic_radius":R,"topwidth":t,"hydraulic_depth":D,"velocity":self.V,"flow":self.Q}
         return result
 
 
@@ -52,8 +63,13 @@ class Openchannalflow:
         R = A/P
         t = self.z1*self.y + self.z2*self.y
         D=A/t
-        self.different_calculations(R,A)        
-        result = {'z1':self.z1,'z2':self.z2,'bottom_width':self.b,'water_depth':self.y,'channel_slope':self.s,'flow_area':A,"wetted_perimeter":P,"hydraulic_radius":R,"topwidth":t,"hydraulic_depth":D,"velocity":self.V,"flow":self.Q}
+        self.different_calculations(R,A)
+        result = {
+            'z1': f"{self.z1:.4f}", 'z2': f"{self.z2:.4f}", 'bottom_width': f"{self.b:.4f}", 'water_depth': f"{self.y:.4f}",
+            'channel_slope': f"{self.s:.4f}", 'flow_area': f"{A:.4f}", "wetted_perimeter": f"{P:.4f}", "hydraulic_radius": f"{R:.4f}",
+            "topwidth": f"{t:.4f}", "hydraulic_depth": f"{D:.4f}", "velocity": f"{self.V:.4f}", "flow": f"{self.Q:.4f}"
+        }        
+        # result = {'z1':self.z1,'z2':self.z2,'bottom_width':self.b,'water_depth':self.y,'channel_slope':self.s,'flow_area':A,"wetted_perimeter":P,"hydraulic_radius":R,"topwidth":t,"hydraulic_depth":D,"velocity":self.V,"flow":self.Q}
         return result
     
     def Circle(self):
@@ -88,43 +104,42 @@ def calculate(request):
     if request.method == 'POST':
         calculation_type = request.POST.get('calculation_type')
         channel_type = request.POST.get('channel_type')
-        basewidth = float(request.POST.get('bottom_width'))
-        height = float(request.POST.get('water_depth'))
-        try:
-            slope1 = float(request.POST.get('z1'))
-            slope2 = float(request.POST.get('z2'))
-        except:
-            slope1 = 0
-            slope2 = 0
+        basewidth = float(request.POST.get('bottom_width', 0))
+        height = float(request.POST.get('water_depth', 0))
+        slope1 = float(request.POST.get('z1', 0))
+        slope2 = float(request.POST.get('z2', 0))
+        cslope = float(request.POST.get('channel_slope', 0))
+        Manning_coefficient = float(request.POST.get('n', 1))
+        velocity = request.POST.get('velocity')
+        discharge = request.POST.get('flow')
+
+        if velocity is not None:
+            velocity = float(velocity)
+        else:
+            velocity = 0
+
+        if discharge is not None:
+            discharge = float(discharge)
+        else:
+            discharge = 0
 
         if calculation_type == 'velocity_discharge':
-            cslope = float(request.POST.get('channel_slope'))
-            Manning_coefficient = float(request.POST.get('n'))
-            a = Openchannalflow(calculation_type,basewidth,height,slope1,slope2,cslope,Manning_coefficient)
+            a = Openchannalflow(calculation_type, basewidth, height, slope1, slope2, cslope, Manning_coefficient)
         
         elif calculation_type == 'channel_slope_v':
-            velocity = float(request.POST.get('velocity'))
-            Manning_coefficient = float(request.POST.get('n'))
-            a = Openchannalflow(calculation_type,basewidth,height,slope1,slope2,velocity,Manning_coefficient)
+            a = Openchannalflow(calculation_type, basewidth, height, slope1, slope2, cslope, Manning_coefficient, velocity)
         
         elif calculation_type == 'channel_slope_q':
-            discharge = float(request.POST.get('flow'))
-            Manning_coefficient = float(request.POST.get('n'))
-            a = Openchannalflow(calculation_type,basewidth,height,slope1,slope2,discharge,Manning_coefficient)
+            a = Openchannalflow(calculation_type, basewidth, height, slope1, slope2, cslope, Manning_coefficient, 0, discharge)
 
         elif calculation_type == 'manning_v':
-            velocity = float(request.POST.get('velocity'))
-            cslope = float(request.POST.get('channel_slope'))
-            a = Openchannalflow(calculation_type,basewidth,height,slope1,slope2,cslope,velocity)
+            a = Openchannalflow(calculation_type, basewidth, height, slope1, slope2, cslope, 0, velocity)
 
         elif calculation_type == 'manning_q':
-            discharge = float(request.POST.get('flow'))
-            cslope = float(request.POST.get('channel_slope'))
-            a = Openchannalflow(calculation_type,basewidth,height,slope1,slope2,cslope,discharge)
+            a = Openchannalflow(calculation_type, basewidth, height, slope1, slope2, cslope, 0, 0, discharge)
 
         elif calculation_type == 'depth_q':
-            discharge = float(request.POST.get('flow'))
-
+            a = Openchannalflow(calculation_type, basewidth, height, slope1, slope2, cslope, 0, 0, discharge)
 
         if channel_type == 'Trapezoid':
             result = a.Trapezoid()
@@ -138,23 +153,9 @@ def calculate(request):
         elif channel_type == 'Circle':
             result = a.Circle()
 
-        context = {
-                    'calculation_type': calculation_type,
-                    'channel_type': channel_type,
-                    'basewidth': basewidth,
-                    'height': height,
-                    'slope1': slope1,
-                    'slope2': slope2,
-                    'channel_slope': cslope,
-                    'velocity': request.POST.get('velocity', ''),
-                    'flow': request.POST.get('flow', ''),
-                    'result': result
-                }
-
-        return render(request, 'opencf.html', context)
+        return JsonResponse(result)
 
     return render(request, 'opencf.html')
-
 
 # Try for error handling
     # try:

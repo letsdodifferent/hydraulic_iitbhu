@@ -49,7 +49,7 @@
         <div class="image-container">
             <img src="{% static '/cweb.jpg' %}" alt="Descriptive Alt Text" class="img-fluid">
         </div>
-        <form id="flowForm" method="post" action="{% url 'calculate' %}"target="_blank">
+        <form id="flowForm" method="post" action="{% url 'calculate' %}">
             {% csrf_token %}
             
             <div class="row"> 
@@ -80,7 +80,7 @@
                 <label for="unitSystem" class="form-label">Select Unit System</label>
                 <div class="col-md-3 mb-3">
                     <div class="form-check">
-                        <input class="form-check-input" type="radio" name="unit_system" id="unitSystemFt" value="ft" checked onchange="updatePlaceholders()">
+                        <input class="form-check-input" type="radio" name="unit_system" id="unitSystemFt" value="ft" checked onchange="updatePlaceholders(); convertUnits('ft')">
                         <label class="form-check-label" for="unitSystemFt">
                             Feet (ft)
                         </label>
@@ -88,7 +88,7 @@
                 </div>
                 <div class="col-md-3 mb-3">
                     <div class="form-check">
-                        <input class="form-check-input" type="radio" name="unit_system" id="unitSystemM" value="m" onchange="updatePlaceholders()">
+                        <input class="form-check-input" type="radio" name="unit_system" id="unitSystemM" value="m" onchange="updatePlaceholders(); convertUnits('m')">
                         <label class="form-check-label" for="unitSystemM">
                             Meter (m)
                         </label>
@@ -100,11 +100,11 @@
                 <div class="row" id="zInputsRow">
                     <div class="col-md-6 mb-3">
                         <label for="z1" class="form-label">Z1 (Trapezoid and triangle only):</label>
-                        <input type="number" class="form-control z-input" step="0.01" name="z1" id="z1" data-name="Z1" required>
+                        <input type="number" class="form-control z-input" step="0.01" name="z1" id="z1" data-name="Z1" required value="{{ z1 }}">
                     </div>
                     <div class="col-md-6 mb-3">
                         <label for="z2" class="form-label">Z2 (Trapezoid and triangle only):</label>
-                        <input type="number" class="form-control z-input" step="0.01" name="z2" id="z2" data-name="Z2" required>
+                        <input type="number" class="form-control z-input" step="0.01" name="z2" id="z2" data-name="Z2" required value="{{ z2 }}">
                     </div>
                 </div>
             </div>
@@ -112,23 +112,23 @@
             <div class="row">
                 <div class="col-md-6 mb-3">
                     <label for="channelSlope" class="form-label">Channel Slope</label>
-                    <input type="number" step="0.01" class="form-control" id="channelSlope" name="channel_slope" placeholder="Slope in ft/ft" required>
+                    <input type="number" step="0.01" class="form-control" id="channelSlope" name="channel_slope" placeholder="Slope in ft/ft" required  value="{{ channel_slope }}">
                 </div>
                 <div class="col-md-6 mb-3">
                     <label for="waterDepth" class="form-label">Water Depth</label>
-                    <input type="number" step="0.01" class="form-control" id="waterDepth" name="water_depth" placeholder="Depth in ft" required>
+                    <input type="number" step="0.01" class="form-control" id="waterDepth" name="water_depth" placeholder="Depth in ft" required value="{{ water_depth }}"> 
                 </div>
             </div>
 
             <div class="row">
                 <div class="col-md-6 mb-3">
                     <label for="bottomWidth" class="form-label">Bottom Width</label>
-                    <input type="number" step="0.01" class="form-control" id="bottomWidth" name="bottom_width" placeholder="Width in ft" required>
+                    <input type="number" step="0.01" class="form-control" id="bottomWidth" name="bottom_width" placeholder="Width in ft" required value="{{ bottom_width }}">
                 </div>
                 
                 <div class="col-md-6 mb-3">
                     <label for="velocity" class="form-label">Velocity</label>
-                    <input name ="fv" type="number" step="0.01" class="form-control" id="velocity" name="velocity" placeholder="Velocity in ft/sec" required>
+                    <input  type="number" step="0.01" class="form-control" id="velocity" name="velocity" placeholder="Velocity in ft/sec" required value="{{ velocity }}">
                 </div>
             
             
@@ -137,7 +137,7 @@
                 <div class="col-md-6 mb-3">
                     
                     <label for="flow" class="form-label">Flow</label>
-                    <input name ="fd" type="number" step="0.01" class="form-control" id="flow" name="flow" placeholder="Discharge in ft³/sec" required>
+                    <input  type="number" step="0.01" class="form-control" id="flow" name="flow" placeholder="Discharge in ft³/sec" required value="{{ flow }}">
                 </div>
             
         
@@ -165,25 +165,25 @@
                 <div class="row">
                     <div class="col-md-6 mb-3">
                         <label for="flow-area" class="form-label">Flow Area:</label>
-                        <input  type="number" step="0.01" class="form-control bg-light text-dark border-0" id="flow-area" name="flow-area"  >
+                        <input  type="number" step="0.01" class="form-control bg-light text-dark border-0" id="flow-area" name="flow-area" value="{{ flow_are  }}">
                    
                         
                     </div>
                     <div class="col-md-6 mb-3">
                         <label for="w-p" class="form-label">Wetted Perimeter:</label>
-                        <input  type="number" step="0.01" class="form-control bg-light text-dark border-0" id="w-p" name="w-p"  >
+                        <input  type="number" step="0.01" class="form-control bg-light text-dark border-0" id="w-p" name="w-p" value="{{ wetted_perimeter }}">
                    
                         </div>
                 </div>
                 <div class="row ">
                     <div class="col-md-6 mb-3">
                         <label for="h-r" class="form-label">hydraulic radius:</label>
-                        <input  type="number" step="0.01" class="form-control bg-light text-dark border-0" id="h-r" name="h-r"  >
+                        <input  type="number" step="0.01" class="form-control bg-light text-dark border-0" id="h-r" name="h-r"  value="{{ hydraulic_radius }}">
                    
                         </div>
                         <div class="col-md-6 mb-3">
                             <label for="t-w" class="form-label">Top Width:</label>
-                            <input  type="number" step="0.01" class="form-control bg-light text-dark border-0" id="t-w" name="t-w"  >
+                            <input  type="number" step="0.01" class="form-control bg-light text-dark border-0" id="t-w" name="t-w"  value="{{ top_width }}">
                        
                             </div>
                        
@@ -226,71 +226,117 @@
             const velocityField = document.getElementById('velocity');
             const flowField = document.getElementById('flow');
             const channelSlopeField = document.getElementById('channelSlope');
-            const nField = document.getElementById('n');    
-            const bottomWidthField = document.getElementById('bottomWidth');
-            const waterDepthField = document.getElementById('waterDepth');
-            const z1Field = document.getElementById('z1');
-            const z2Field = document.getElementById('z2');  
-            const flowAreaField = document.getElementById('flow-area');
-            const wPField = document.getElementById('w-p');
-            const hRField = document.getElementById('h-r');
-            const tWField = document.getElementById('t-w');
-
 
             // Reset fields
             velocityField.disabled = false;
             flowField.disabled = false;
             channelSlopeField.disabled = false;
-            z1Field.value="{{ z1 }}";
-            z2Field.value="{{ z2 }}";
-            bottomWidthField.value="{{ bottom_width }}";
-            waterDepthField.value="{{ water_depth }}";
-            flowAreaField.value="{{ flow_area }}";
-            wPField.value="{{ wetted_perimeter }}";
-            hRField.value="{{ hydraulic_radius }}";
-            tWField.value="{{ topwidth}}";
-            channelSlopeField.value = "{{ channel_slope }}";
-            
+
             switch(calculationType) {
                 case 'velocity_discharge':
                     velocityField.disabled = true;
                     flowField.disabled = true;
-                    flowField.value = "{{ flow }}";
-                    velocityField.value = "{{ velocity }}";
                     break;
                 case 'channel_slope_v':
-                    flowField.disabled = true;
                     channelSlopeField.disabled = true;
-                    flowField.value = "{{ flow }}";
-                    channelSlopeField.value = "{{ channel_slope }}";
+                    flowField.disabled = true;
+                    velocityField.disabled = false;
                     break;
                 case 'channel_slope_q':
-                    velocityField.disabled = true;
                     channelSlopeField.disabled = true;
-                    velocityField.value = "{{ velocity }}";
-                    channelSlopeField.value = "{{ channel_slope }}";
+                    velocityField.disabled = true;
                     break;
                 case 'manning_v':
                     flowField.disabled = true;
-                    flowField.value = "{{ flow }}";
                     break;
                 case 'manning_q':
                     velocityField.disabled = true;
-                    velocityField.value = "{{ velocity }}";
                     break;
                 case 'depth_q':
                     velocityField.disabled = true;
-                    velocityField.value = "{{ velocity }}";
                     break;
             }
         }
+        function convertUnits(unit) {
+        const lengthConversionFactor = unit === 'm' ? 0.3048 : 1 / 0.3048;
+        const flowConversionFactor = unit === 'm' ? 0.0283168 : 1 / 0.0283168;
+        const areaConversionFactor = lengthConversionFactor ** 2;
+
+        const lengthFields = ['waterDepth', 'bottomWidth', 't-w','w-p','h-r'];
+        const velocityFields = ['velocity'];
+        const flowFields = ['flow'];
+        const areaFields = ['flow-area'];
+
+        lengthFields.forEach(fieldId => {
+            const field = document.getElementById(fieldId);
+            if (field && field.value) {
+                field.value = (parseFloat(field.value) * lengthConversionFactor).toFixed(4);
+            }
+        });
+
+        velocityFields.forEach(fieldId => {
+            const field = document.getElementById(fieldId);
+            if (field && field.value) {
+                field.value = (parseFloat(field.value) * lengthConversionFactor).toFixed(4);
+            }
+        });
+
+        flowFields.forEach(fieldId => {
+            const field = document.getElementById(fieldId);
+            if (field && field.value) {
+                field.value = (parseFloat(field.value) * flowConversionFactor).toFixed(4);
+            }
+        });
+
+        areaFields.forEach(fieldId => {
+            const field = document.getElementById(fieldId);
+            if (field && field.value) {
+                field.value = (parseFloat(field.value) * areaConversionFactor).toFixed(4);
+            }
+        });
+    }
+        document.getElementById('flowForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent the default form submission
+
+            const form = event.target;
+            const formData = new FormData(form);
+
+            fetch(form.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRFToken': formData.get('csrfmiddlewaretoken')
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Handle the response data
+                console.log(data);
+                // Update the form fields with the response data if needed
+                // For example:
+                document.getElementById('flow-area').value = data.flow_area;
+            document.getElementById('w-p').value = data.wetted_perimeter;
+            document.getElementById('h-r').value = data.hydraulic_radius;
+            document.getElementById('t-w').value = data.top_width;
+            document.getElementById('flow').value = data.flow;
+            document.getElementById('velocity').value = data.velocity;
+            document.getElementById('channelSlope').value = data.channel_slope;
+            document.getElementById('t-w').value = data.topwidth;
+            
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        });
 
         function handleReset() {
             const form = document.getElementById('flowForm');
             form.reset();
-            toggleZInputs();
-            toggleVelocityFlowFields();
-            updatePlaceholders();
+
+            // Enable the input fields for velocity and discharge
+            document.getElementById('velocity').disabled = false;
+            document.getElementById('flow').disabled = false;
+            document.getElementById('channelSlope').disabled = false;
         }
 
         function showLastFiveInputs() {
@@ -301,7 +347,6 @@
         // Initialize event listeners
         document.getElementById('channelType').addEventListener('change', toggleZInputs);
         document.getElementById('calculationType').addEventListener('change', toggleVelocityFlowFields);
-        document.getElementById('flowForm').addEventListener('click', showLastFiveInputs);
         
         // Initial setup
         toggleZInputs();
