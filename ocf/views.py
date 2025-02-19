@@ -106,8 +106,12 @@ def calculate(request):
         channel_type = request.POST.get('channel_type')
         basewidth = float(request.POST.get('bottom_width', 0))
         height = float(request.POST.get('water_depth', 0))
-        slope1 = float(request.POST.get('z1', 0))
-        slope2 = float(request.POST.get('z2', 0))
+        try:
+            slope1 = float(request.POST.get('z1', 0))
+            slope2 = float(request.POST.get('z2', 0))
+        except:
+            slope1 = 0
+            slope2 = 0
         cslope = float(request.POST.get('channel_slope', 0))
         Manning_coefficient = float(request.POST.get('n', 1))
         velocity = request.POST.get('velocity')
