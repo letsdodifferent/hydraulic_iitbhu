@@ -1,4 +1,4 @@
 venv/
 
 __pycache__/
-
+wsd/static/output_SRTMGL1.tif

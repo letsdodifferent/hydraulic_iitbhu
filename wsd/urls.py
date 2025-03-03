@@ -4,5 +4,5 @@ from . import views
 
 urlpatterns = [
     path('', views.main, name='main'),
-    path('generate_image/', views.wsd, name='wsd'),
+    path('wsd/', views.wsd, name='wsd'),
 ]

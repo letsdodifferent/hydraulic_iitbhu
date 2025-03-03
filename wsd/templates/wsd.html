@@ -48,6 +48,17 @@
             background-color: #0056b3;
             border-color: #004085;
         }
+        .plot-container {
+            margin-bottom: 20px;
+        }
+        .plot-img {
+            max-width: 100%;
+            height: auto;
+        }
+        .error-message {
+            color: red;
+            margin-top: 10px;
+        }
     </style>
 </head>
 <body>
@@ -59,78 +70,76 @@
             {% csrf_token %}
             <div class="form-group">
                 <label for="latitude">Latitude</label>
-                <input type="number" step="0.01" class="form-control" id="latitude" name="lat" required>
+                <input type="number" step="0.0001" class="form-control" id="latitude" name="lat" required>
             </div>
             <div class="form-group">
                 <label for="longitude">Longitude</label>
-                <input type="number" step="0.01" class="form-control" id="longitude" name="long" required>
+                <input type="number" step="0.0001" class="form-control" id="longitude" name="long" required>
             </div>
             <div class="text-center">
                 <button type="submit" class="btn btn-primary">Calculate</button>
                 <button type="button" class="btn btn-secondary" onclick="resetForm()">Reset</button>
             </div>
         </form>
-        <div id="results" class="result">
-            {% if plot_data %}
-                <h2>Results</h2>
-                <div class="plot-container">
-                    <h3>Digital Elevation Model</h3>
-                    <img src="{{ plot_data.dem_url }}" class="plot-img">
-                </div>
-                <div class="plot-container">
-                    <h3>Flow Direction</h3>
-                    <img src="{{ plot_data.fdir_url }}" class="plot-img">
-                </div>
-                <div class="plot-container">
-                    <h3>Catchment Area</h3>
-                    <img src="{{ plot_data.catchment_url }}" class="plot-img">
-                </div>
-            {% endif %}
-        </div>
+        <div id="results" class="result"></div>
     </div>
     <script>
-        document.getElementById('wsdForm').addEventListener('submit', function(event) {
-            event.preventDefault(); // Prevent the default form submission
+    document.getElementById('wsdForm').addEventListener('submit', function(event) {
+        event.preventDefault(); // Prevent the default form submission
 
-            const form = event.target;
-            const formData = new FormData(form);
+        const form = event.target;
+        const formData = new FormData(form);
 
-            fetch(form.action, {
-                method: 'POST',
-                body: formData,
-                headers: {
-                    'X-CSRFToken': formData.get('csrfmiddlewaretoken')
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                // Handle the response data
-                const resultsDiv = document.getElementById('results');
+        fetch(form.action, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}'
+            }
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            // Handle the response data
+            const resultsDiv = document.getElementById('results');
+            if (data.images) {
                 resultsDiv.innerHTML = `
                     <h2>Results</h2>
                     <div class="plot-container">
-                        <h3>Digital Elevation Model</h3>
-                        <img src="${data.dem_url}" class="plot-img">
+                        <h3>Delineated Catchment</h3>
+                        <img src="data:image/png;base64,${data.images.catchment}" class="plot-img">
                     </div>
                     <div class="plot-container">
-                        <h3>Flow Direction</h3>
-                        <img src="${data.fdir_url}" class="plot-img">
+                        <h3>D8 Channels</h3>
+                        <img src="data:image/png;base64,${data.images.channels}" class="plot-img">
                     </div>
                     <div class="plot-container">
-                        <h3>Catchment Area</h3>
-                        <img src="${data.catchment_url}" class="plot-img">
+                        <h3>Flow Distance</h3>
+                        <img src="data:image/png;base64,${data.images.distance}" class="plot-img">
                     </div>
                 `;
-            })
-            .catch(error => {
-                console.error('Error:', error);
-            });
+            } else if (data.error) {
+                resultsDiv.innerHTML = `<p class="error-message">Error: ${data.error}</p>`;
+            } else {
+                resultsDiv.innerHTML = '<p class="error-message">No data available.</p>';
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = `<p class="error-message">An error occurred: ${error.message}</p>`;
         });
+    });
 
-        function resetForm() {
-            document.getElementById('latitude').value = '';
-            document.getElementById('longitude').value = '';
-        }
-    </script>
+    function resetForm() {
+        document.getElementById('latitude').value = '';
+        document.getElementById('longitude').value = '';
+        document.getElementById('results').innerHTML = ''; // Clear results
+    }
+</script>
 </body>
 </html>
