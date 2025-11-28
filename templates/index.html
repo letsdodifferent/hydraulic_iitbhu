@@ -3,69 +3,81 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hydraulic and Hydrology Applications</title>
+    <title>Hydraulic and Hydrological Applications</title>
     <link rel="icon" type="image/x-icon" href="../static/favicon.ico">
     <style>
         body {
             margin: 0;
-            font-family: 'Times New Roman', Times, serif, sans-serif;
-            background: linear-gradient(to bottom, #cce7ff, #00509e);
-            background-image: url('../static/water.gif');
-            color: #fff;
+            font-family: 'Arial', sans-serif;
+            background: #ffffff; /* White background */
+            color: #333; /* Dark text for readability */
             text-align: center;
         }
 
         header {
-            padding: 50px;
-            background: rgba(0, 80, 158, 0.8);
-            /* display: flex; */
-            /* align-items: center; */
-            /* justify-content: space-between; */
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
-        }
-        .image{
+            padding: 20px;
+            background: #00509e; /* Professional blue */
+            color: #fff;
             display: flex;
-            justify-content: space-evenly;
             align-items: center;
-        }
-        header img {
-            height: 170px;     
+            justify-content: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
         }
 
-        h1 {
-            height: 60px;
-            padding: 20px;
-            flex-grow: 1;
-            text-align: center;
+        .image {
+            display: flex;
             align-items: center;
-            font-size: 2.5rem;
-            border: 2px solid black;
-            background: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+        }
+
+        header img {
+            height: 80px;
+            margin-right: 20px;
+        }
+
+        header h1 {
+            font-size: 2rem;
+            font-family: 'Georgia', serif;
+            margin: 0;
+        }
+
+        .title {
+            margin: 20px 0;
+        }
+
+        .title marquee {
+            background: #f8f9fa; /* Light gray for contrast */
+            color: #00509e; /* Blue text */
+            padding: 10px;
+            font-size: 1.5rem;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
 
         main {
             display: flex;
             justify-content: space-evenly;
-            margin: 200px 50px;
+            align-items: flex-start;
+            margin: 20px auto;
             padding: 20px;
-            border-radius: 10px;
-            background: rgba(255, 255, 255, 0.1);
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            max-width: 1200px;
+            gap: 20px;
         }
 
         section {
-            font-size: 2.2rem;
             width: 45%;
+            background: #f8f9fa; /* Light gray background */
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
         }
 
         section h2 {
-            border: 1.5px solid #000;
-            background-color: black;
-            padding: 10px;
-            font-size: 2rem;
-            /* text-decoration: underline; */
-            border-radius: 70%;
+            font-size: 1.8rem;
+            color: #00509e; /* Blue text */
             margin-bottom: 20px;
+            border-bottom: 2px solid #00509e;
+            padding-bottom: 10px;
         }
 
         button {
@@ -73,59 +85,139 @@
             width: 90%;
             margin: 10px auto;
             padding: 10px;
-            background-color: #0073e6;
+            background-color: #007bff; /* Bootstrap blue */
             color: #fff;
             border: none;
             border-radius: 5px;
-            font-size: 1.5rem;
+            font-size: 1.2rem;
             cursor: pointer;
+            transition: background-color 0.3s ease;
         }
 
         button:hover {
-            background-color: #005bb5;
+            background-color: #0056b3; /* Darker blue on hover */
         }
 
         footer {
-            margin-top: 50px;
+            margin-top: 20px;
+            padding: 10px;
+            background: #00509e; /* Professional blue */
+            color: #fff;
             font-size: 0.9rem;
+            text-align: center;
+        }
+
+        @media (max-width: 768px) {
+            main {
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            section {
+                width: 90%;
+            }
+
+            .title marquee {
+                font-size: 1.2rem;
+            }
+
+            button {
+                font-size: 1rem;
+            }
         }
     </style>
 </head>
 <body>
+    <!-- Header Section -->
     <header>
-        <div>
-            <div class="image">
-        <!-- <img src="../static/mobileheader.jpg" > -->
-        <img src="../static/iitbhulogo.png" >
-        <img src="../static/iit_emblem_original.jpg" >
+        <div class="image">
+            <img src="../static/iitbhulogo.png" alt="IIT BHU Logo">
+            <h1>Hydraulics and Hydrological Computations</h1>
+        </div>
     </header>
-</div>
 
-<h1>Welcome to Our Web-Based Computations for Hydraulic and Hydrology Applications</h1>
-</div>
+    <!-- Title Section -->
+    <div class="title">
+        <marquee behavior="scroll" direction="left">
+            Welcome to Our Web-Based Computations for Hydraulic and Hydrological Applications
+        </marquee>
+    </div>
+
+    <!-- Main Content -->
     <main>
-    
+        <!-- Hydraulic Section -->
         <section>
-            <h2>Hydraulic</h2>
+            <h2>Hydraulics</h2>
             <button onclick="location.href='opencf'">Open Channel Flow</button>
-            <button onclick="location.href='pipe'">friction head loss</button>
-            <button onclick="location.href='turbulence.html'">Turbulence</button>
-            <button>Button 4</button>
-            <button>Button 5</button>
-            <button>Button 6</button>
+            <button onclick="location.href='pipe'">Friction Head Loss</button>
+            <button onclick="location.href='rect'">Rectangular Notch</button>
         </section>
+
+        <!-- Hydrology Section -->
         <section>
-            <h2>Hydrology</h2>
-            <button onclick="location.href='wsd'">Ground Water</button>
-            <button onclick="location.href='surface_water.html'">Surface Water</button>
-            <button>Button 3</button>
-            <button>Button 4</button>
-            <button>Button 5</button>
-            <button>Button 6</button>
+        <h2>Hydrology</h2>
+            <button onclick="location.href='basin'">ganga basin</button>
+           
+            <button onclick="location.href='wsd'">Watershed Delineation</button>
+        
         </section>
     </main>
-    <footer>
-        <p>&copy; 2025 Hydraulic and Hydrology Team</p>
+
+    <!-- Footer Section -->
+    <footer style="position: fixed; bottom: 0; left: 0; width: 100%; z-index: 100;">
+        <p>&copy; 2025 Hydraulic and Hydrology Team. All rights reserved.</p>
     </footer>
 </body>
 </html>
+// ===============================
+// 1. Geometry: Assi Ghat
+// ===============================
+var assiGhat = ee.Geometry.Point([83.0065, 25.2886]); // lon, lat
+
+Map.centerObject(assiGhat, 14);
+Map.addLayer(assiGhat, {color: 'red'}, 'Assi Ghat point');
+
+// ===============================
+// 2. Choose dataset (Sentinel-2 SR)
+// ===============================
+// Change collection ID if you want Landsat etc.
+var collection = ee.ImageCollection('COPERNICUS/S2_SR')
+  .filterBounds(assiGhat)
+  .filterDate('2017-01-01', '2025-01-01')   // <--- change dates if needed
+  .filter(ee.Filter.lte('CLOUDY_PIXEL_PERCENTAGE', 20));  // cloud filter
+
+print('Number of images:', collection.size());
+print('First image:', collection.first());
+
+// ===============================
+// 3. Extract all band values at the point
+// ===============================
+var scale = 10;  // Sentinel-2 native resolution for main bands
+
+var fc = collection.map(function (img) {
+  // get all bands at the point
+  var dict = img.reduceRegion({
+    reducer: ee.Reducer.first(),  // take pixel value at the point
+    geometry: assiGhat,
+    scale: scale,
+    bestEffort: true
+  });
+
+  // turn dict into a Feature, add date & image id
+  return ee.Feature(null, dict)
+    .set('date', img.date().format('YYYY-MM-dd'))
+    .set('image_id', img.id());
+});
+
+print('FeatureCollection to export:', fc.limit(5));
+
+// ===============================
+// 4. Export to CSV (Google Drive)
+// ===============================
+Export.table.toDrive({
+  collection: fc,
+  description: 'AssiGhat_Sentinel2_AllBands',
+  fileFormat: 'CSV'
+  // folder: 'GEE_Exports',    // optional: uncomment & set your folder name
+});
+-

@@ -24,4 +24,7 @@ urlpatterns = [
     path('opencf/',include('ocf.urls')),
     path('pipe/',include('pipe.urls')),
     path('wsd/',include('wsd.urls')),
+    path('rect/',include('rect.urls')),
+    path('basin/',include('basin.urls')),
+    # path('rect/',include('rect.urls')),
 ]

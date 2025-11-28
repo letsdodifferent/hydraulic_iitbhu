@@ -1,0 +1,607 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Water Quality Parameter of Ganga — Varanasi</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="icon" type="image/x-icon" href="{% static 'favicon.ico' %}">
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.3.0/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Arial', sans-serif;
+      background: #ffffff;
+      color: #333;
+    }
+
+    header {
+      padding: 20px;
+      background: #00509e;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    }
+
+    .image {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    header img {
+      height: 80px;
+      margin-right: 20px;
+    }
+
+    header h1 {
+      font-size: 2rem;
+      font-family: 'Georgia', serif;
+      margin: 0;
+    }
+
+    .navbar {
+      background-color: #f8f9fa;
+      padding: 10px 0;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .navbar-brand {
+      margin-left: 20px;
+      font-weight: bold;
+      color: #00509e !important;
+      font-size: 1.2rem;
+    }
+
+    .container {
+      max-width: 980px;
+      margin: 30px auto;
+      background: #f8f9fa;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    h1 {
+      margin: 0 0 8px 0;
+      font-size: 1.8rem;
+      color: #00509e;
+      border-bottom: 2px solid #00509e;
+      padding-bottom: 10px;
+    }
+
+    p.sub {
+      margin-top: 4px;
+      color: #475569;
+      line-height: 1.5;
+    }
+
+    .row {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      align-items: center;
+      margin-top: 20px;
+    }
+
+    label {
+      font-weight: 600;
+      margin-right: 6px;
+      color: #00509e;
+    }
+
+    select, input[type="date"] {
+      padding: 10px;
+      border-radius: 5px;
+      border: 1px solid #ced4da;
+      background: #fff;
+      font-size: 1rem;
+    }
+
+    select option[disabled] { color: #999; }
+
+    button {
+      display: inline-block;
+      padding: 10px 20px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover { background-color: #0056b3; }
+    button:disabled { background-color: #6c757d; cursor: not-allowed; }
+
+    .meta { font-size: 13px; color: #475569; margin-top: 12px; }
+    #computedRange { font-weight: 600; color: #00509e; margin-left: 6px; }
+
+    .spinner {
+      display: inline-block;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      border: 2px solid rgba(0, 0, 0, 0.08);
+      border-left-color: #0b69ff;
+      animation: spin 1s linear infinite;
+      margin-left: 8px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    #error {
+      color: #b00020;
+      margin-top: 12px;
+      display: none;
+      padding: 10px;
+      background: #ffebee;
+      border-radius: 5px;
+      border-left: 4px solid #b00020;
+    }
+
+    /* Fixed chart wrapper with proper dimensions */
+    #chartWrap {
+      margin-top: 30px;
+      background: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      display: none;
+    }
+
+    /* Chart blocks with fixed height */
+    .chart-block {
+      width: 100%;
+      margin-bottom: 30px;
+      padding: 15px;
+      background: #fff;
+      border-radius: 8px;
+      border: 1px solid #e9ecef;
+    }
+
+    .chart-block h3 {
+      margin: 0 0 15px 0;
+      color: #00509e;
+      font-size: 1.1rem;
+    }
+
+    /* Canvas container with fixed dimensions */
+    .canvas-wrapper {
+      position: relative;
+      width: 100%;
+      height: 350px;
+      margin-bottom: 10px;
+    }
+
+    .canvas-wrapper canvas {
+      display: block;
+      max-width: 100%;
+    }
+
+    #sampleCsv {
+      margin-top: 18px;
+      background: #fff;
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px dashed #d1d5db;
+      font-family: monospace;
+      display:none;
+    }
+    #sampleCsv table { width:100%; border-collapse:collapse; }
+    #sampleCsv th, #sampleCsv td { padding:6px 8px; text-align:left; border-bottom:1px solid #eee; }
+    #sampleCsv caption { text-align:left; font-weight:700; margin-bottom:8px; color:#0b1220; }
+
+    footer {
+      margin-top: 30px;
+      padding: 15px;
+      background: #00509e;
+      color: #fff;
+      font-size: 0.9rem;
+      text-align: center;
+      box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.2);
+    }
+
+    @media (max-width: 768px) {
+      .row { flex-direction: column; gap: 10px; }
+      label, select, input[type="date"], button { width: 100%; }
+      .canvas-wrapper { height: 280px; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header>
+    <div class="image">
+      <img src="{% static 'iitbhulogo.png' %}" alt="IIT BHU Logo">
+      <h1 style="color: #fff;">Water Quality Prediction</h1>
+    </div>
+  </header>
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <a class="navbar-brand" href="/">Home</a>
+  </nav>
+
+  <!-- Main Container -->
+  <div class="container">
+    <h1>Water Quality Parameter of Ganga — Varanasi</h1>
+    <p class="sub">
+      Select a location (only Assi / Ashi Ghat is currently clickable), then choose a 
+      <b>start date</b> and <b>end date</b> (day, month, year). The page will show a 5-row sample CSV
+      and then display predicted pH and DO time-series for each day in the selected range. You can also
+      download the CSV and combined graph image.
+    </p>
+
+    <form id="predictForm">
+      {% csrf_token %}
+      <div class="row">
+        <label for="location">Location</label>
+        <select id="location" name="location" required>
+          <option value="cremation_ghat" data-lat="25.3100" data-lon="83.0100" disabled>
+            Cremation Ghat (not selectable)
+          </option>
+          <option value="assi_ghat" data-lat="25.2950" data-lon="83.0105">
+            Assi / Ashi Ghat (clickable)
+          </option>
+          <option value="malviya_bridge" data-lat="25.3045" data-lon="83.0250" disabled>
+            Malviya Bridge (not selectable)
+          </option>
+          <option value="vs_bridge" data-lat="25.3170" data-lon="82.9900" disabled>
+            VS Bridge (not selectable)
+          </option>
+        </select>
+
+        <label for="startDate">Start Date</label>
+        <input id="startDate" name="start_date" type="date" required />
+
+        <label for="endDate">End Date</label>
+        <input id="endDate" name="end_date" type="date" required />
+
+        <button type="submit" id="submitBtn">Submit</button>
+        <div id="loading" style="display:none;"><span class="spinner"></span></div>
+      </div>
+
+      <div class="meta">
+        Selected range (daily): <span id="computedRange">—</span>
+      </div>
+    </form>
+
+    <div id="error"></div>
+
+    <!-- Sample CSV preview -->
+    <div id="sampleCsv" aria-live="polite">
+      <caption>Sample CSV (first 5 days)</caption>
+      <table>
+        <thead>
+          <tr><th>Date (dd/mm/yyyy)</th><th>pH</th><th>DO (mg/L)</th><th>TSS (mg/L)</th></tr>
+        </thead>
+        <tbody id="sampleCsvBody"></tbody>
+      </table>
+    </div>
+
+    <!-- Charts (stacked vertically, hidden until prediction) -->
+    <div id="chartWrap">
+      <!-- pH chart (top) -->
+      <div class="chart-block">
+        <h3>Predicted pH</h3>
+        <div class="canvas-wrapper">
+          <canvas id="phChart"></canvas>
+        </div>
+      </div>
+
+      <!-- DO chart (bottom) -->
+      <div class="chart-block">
+        <h3>Predicted DO (mg/L)</h3>
+        <div class="canvas-wrapper">
+          <canvas id="doChart"></canvas>
+        </div>
+      </div>
+
+      <div style="margin-top:14px; display:flex; gap:12px; align-items:center; flex-wrap:wrap;">
+        <button id="downloadCsvBtn" disabled>Download CSV</button>
+        <button id="downloadGraphBtn" disabled>Download Graph (PNG)</button>
+        <div style="color:#475569; font-size:13px;">
+          (Downloads are enabled after predictions appear)
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    <p>&copy; 2025 Hydraulic and Hydrology Team. All rights reserved.</p>
+  </footer>
+
+  <script>
+    // CSRF helper
+    function getCookie(name) {
+      if (!document.cookie) return null;
+      const cookies = document.cookie.split(';').map(c => c.trim());
+      for (const c of cookies) {
+        if (c.startsWith(name + '=')) return decodeURIComponent(c.split('=')[1]);
+      }
+      return null;
+    }
+
+    // Format ISO date (YYYY-MM-DD) to dd/mm/yyyy
+    function formatDDMMYYYY(iso) {
+      const [y, m, d] = iso.split('-');
+      return `${d}/${m}/${y}`;
+    }
+
+    // Build list of ISO dates between start and end inclusive
+    function buildDayList(startIso, endIso) {
+      const start = new Date(startIso);
+      const end = new Date(endIso);
+      if (end < start) return [];
+      const out = [];
+      let cur = new Date(start);
+      while (cur <= end) {
+        const iso = cur.toISOString().slice(0, 10);
+        out.push(iso);
+        cur.setDate(cur.getDate() + 1);
+      }
+      return out;
+    }
+
+    const startInput = document.getElementById('startDate');
+    const endInput   = document.getElementById('endDate');
+    const computedRangeEl = document.getElementById('computedRange');
+    const form = document.getElementById('predictForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const loading = document.getElementById('loading');
+    const errorDiv = document.getElementById('error');
+    const sampleCsvDiv = document.getElementById('sampleCsv');
+    const sampleCsvBody = document.getElementById('sampleCsvBody');
+    const downloadCsvBtn = document.getElementById('downloadCsvBtn');
+    const downloadGraphBtn = document.getElementById('downloadGraphBtn');
+    const chartWrap = document.getElementById('chartWrap');
+
+    // Charts: daily x-axis, stacked vertically with fixed dimensions
+    const phCtx = document.getElementById('phChart').getContext('2d');
+    const doCtx = document.getElementById('doChart').getContext('2d');
+
+    const phChart = new Chart(phCtx, {
+      type: 'line',
+      data: { datasets: [{ label: 'pH', data: [], borderWidth: 2, tension: 0.28 }] },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        interaction: { mode: 'nearest', axis: 'x', intersect: false },
+        scales: {
+          x: { type: 'time', time: { unit: 'day' }, title: { display:true, text:'Date' } },
+          y: { title: { display:true, text:'pH' }, suggestedMin:0, suggestedMax:14 }
+        },
+        plugins: { legend:{display:false} }
+      }
+    });
+    phChart.data.datasets[0].borderColor = '#0b69ff';
+    phChart.data.datasets[0].backgroundColor = 'rgba(11, 105, 255, 0.1)';
+
+    const doChart = new Chart(doCtx, {
+      type: 'line',
+      data: { datasets: [{ label: 'DO (mg/L)', data: [], borderWidth: 2, tension: 0.28 }] },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        interaction: { mode: 'nearest', axis: 'x', intersect: false },
+        scales: {
+          x: { type: 'time', time: { unit: 'day' }, title: { display:true, text:'Date' } },
+          y: { title: { display:true, text:'DO (mg/L)' } }
+        },
+        plugins: { legend:{display:false} }
+      }
+    });
+    doChart.data.datasets[0].borderColor = '#f97316';
+    doChart.data.datasets[0].backgroundColor = 'rgba(249, 115, 22, 0.1)';
+
+    function updateRangeAndSample() {
+      const start = startInput.value;
+      const end   = endInput.value;
+      if (!start || !end) {
+        computedRangeEl.textContent = '—';
+        sampleCsvDiv.style.display = 'none';
+        return;
+      }
+      if (end < start) {
+        computedRangeEl.textContent = 'Invalid: end < start';
+        sampleCsvDiv.style.display = 'none';
+        return;
+      }
+
+      const days = buildDayList(start, end);
+      if (!days.length) {
+        computedRangeEl.textContent = '—';
+        sampleCsvDiv.style.display = 'none';
+        return;
+      }
+
+      const startDisp = formatDDMMYYYY(days[0]);
+      const endDisp   = formatDDMMYYYY(days[days.length - 1]);
+      computedRangeEl.textContent = `${startDisp} → ${endDisp}`;
+
+      sampleCsvBody.innerHTML = '';
+      const maxRows = Math.min(5, days.length);
+      for (let i = 0; i < maxRows; i++) {
+        const dateIso  = days[i];
+        const dateDisp = formatDDMMYYYY(dateIso);
+        const samplePh  = (7.0 + 0.05 * i).toFixed(3);
+        const sampleDo  = (6.0 + 0.1 * i).toFixed(3);
+        ; const sampleTss = (40 + 1.5 * i).toFixed(3);
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td>${dateDisp}</td><td>${samplePh}</td><td>${sampleDo}</td>`;
+        sampleCsvBody.appendChild(tr);
+      }
+      sampleCsvDiv.style.display = 'block';
+    }
+
+    startInput.addEventListener('change', updateRangeAndSample);
+    endInput.addEventListener('change', updateRangeAndSample);
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      errorDiv.style.display = 'none';
+      submitBtn.disabled = true;
+      loading.style.display = 'inline-block';
+      downloadCsvBtn.disabled = true;
+      downloadGraphBtn.disabled = true;
+
+      const locSelect = document.getElementById('location');
+      const option = locSelect.options[locSelect.selectedIndex];
+      const location_id = locSelect.value;
+      const lat = parseFloat(option.dataset.lat);
+      const lon = parseFloat(option.dataset.lon);
+
+      if (option.disabled) {
+        errorDiv.innerText = 'Selected location is not selectable. Choose Assi / Ashi Ghat.';
+        errorDiv.style.display = 'block';
+        submitBtn.disabled = false;
+        loading.style.display = 'none';
+        return;
+      }
+
+      const start = startInput.value;
+      const end   = endInput.value;
+      if (!start || !end) {
+        errorDiv.innerText = 'Please choose both start and end date.';
+        errorDiv.style.display = 'block';
+        submitBtn.disabled = false;
+        loading.style.display = 'none';
+        return;
+      }
+      if (end < start) {
+        errorDiv.innerText = 'End date cannot be earlier than start date.';
+        errorDiv.style.display = 'block';
+        submitBtn.disabled = false;
+        loading.style.display = 'none';
+        return;
+      }
+
+      const payload = {
+        location_id,
+        lat, lon,
+        start_date: start,
+        end_date: end
+      };
+
+      try {
+        const csrftoken = getCookie('csrftoken');
+        const res = await fetch("{% url 'water_predict' %}", {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            ...(csrftoken ? { 'X-CSRFToken': csrftoken } : {})
+          },
+          body: JSON.stringify(payload)
+        });
+
+        if (!res.ok) {
+          const txt = await res.text();
+          throw new Error(txt || `Server error ${res.status}`);
+        }
+
+        const data = await res.json();
+        if (!data.dates || !Array.isArray(data.ph) || !Array.isArray(data.do)) {
+          throw new Error('Malformed response from server');
+        }
+
+        phChart.data.datasets[0].data = data.dates.map((d, i) => ({ x: d, y: data.ph[i] }));
+        phChart.update();
+
+        doChart.data.datasets[0].data = data.dates.map((d, i) => ({ x: d, y: data.do[i] }));
+        doChart.update();
+
+        chartWrap.style.display = 'block';
+
+        window._lastPrediction = {
+          dates: data.dates,
+          ph: data.ph,
+          do: data.do,
+          tss: data.tss || []
+        };
+        downloadCsvBtn.disabled = false;
+        downloadGraphBtn.disabled = false;
+
+        chartWrap.scrollIntoView({ behavior: 'smooth' });
+
+      } catch (err) {
+        console.error(err);
+        errorDiv.innerText = 'Error: ' + err.message;
+        errorDiv.style.display = 'block';
+      } finally {
+        submitBtn.disabled = false;
+        loading.style.display = 'none';
+      }
+    });
+
+    // Download CSV
+    downloadCsvBtn.addEventListener('click', () => {
+      const d = window._lastPrediction;
+      if (!d) return;
+      const headers = ['Date_dd_mm_yyyy','pH','DO_mg_per_L','TSS_mg_per_L'];
+      const lines = [headers.join(',')];
+      for (let i = 0; i < d.dates.length; i++) {
+        const dateDisp = formatDDMMYYYY(d.dates[i]);
+        const row = [
+          dateDisp,
+          d.ph?.[i] ?? '',
+          d.do?.[i] ?? '',
+          d.tss?.[i] ?? ''
+        ];
+        lines.push(row.join(','));
+      }
+      const csv = lines.join('\n');
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'predictions_daily.csv';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    });
+
+    // Download combined graph
+    downloadGraphBtn.addEventListener('click', async () => {
+      const phUrl = phChart.toBase64Image();
+      const doUrl = doChart.toBase64Image();
+      const img1 = new Image();
+      const img2 = new Image();
+      img1.src = phUrl;
+      img2.src = doUrl;
+
+      await Promise.all([
+        new Promise(res => img1.onload = res),
+        new Promise(res => img2.onload = res)
+      ]);
+
+      const width = Math.max(img1.width, img2.width);
+      const height = img1.height + img2.height + 20;
+      const canvas = document.createElement('canvas');
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext('2d');
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, width, height);
+      ctx.drawImage(img1, 0, 0);
+      ctx.drawImage(img2, 0, img1.height + 20);
+
+      const url = canvas.toDataURL('image/png');
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'predicted_graphs_daily.png';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+    });
+  </script>
+</body>
+</html>

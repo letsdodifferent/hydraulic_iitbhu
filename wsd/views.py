@@ -11,7 +11,7 @@ from django.shortcuts import render
 def main(request):
     return render(request,"wsd.html")
 
-class WatershedProcessor:
+# class WatershedProcessor:
     def __init__(self):
         # Initialize variables
         self.grid = None
@@ -45,12 +45,18 @@ class WatershedProcessor:
     def generate_plots(self, lat, lon):
         try:
             # Snap pour point to high accumulation cell
-            x_snap, y_snap = self.grid.snap_to_mask(self.acc > 200000, (lon, lat))
+            x_snap, y_snap = self.grid.snap_to_mask(self.acc > 20000, (lon, lat))
 
             # Delineate the catchment
             catch = self.grid.catchment(x=x_snap, y=y_snap, fdir=self.fdir, dirmap=self.dirmap, xytype='coordinate')
+            # self.grid.clip_to(catch)
+            # dem_array = self.dem.copy()
+            # clipped_catch = np.where(catch, dem_array, np.nan)
+
             self.grid.clip_to(catch)
             clipped_catch = self.grid.view(catch)
+
+            # clipped_catch = self.grid.view(catch)
 
             # Extract river network (D8 channels)
             branches = self.grid.extract_river_network(self.fdir, self.acc > 500, dirmap=self.dirmap)
@@ -119,10 +125,10 @@ class WatershedProcessor:
             return {'error': str(e)}
 
 # Instantiate the processor and initialize it (runs only once)
-watershed_processor = WatershedProcessor()
-watershed_processor.initialize()
+# watershed_processor = WatershedProcessor()
+# watershed_processor.initialize()
 
-import traceback  # Import for detailed error tracing
+# import traceback  # Import for detailed error tracing
 
 # from django.http import JsonResponse
 

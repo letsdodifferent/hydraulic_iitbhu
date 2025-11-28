@@ -1,14 +1,27 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
-    <a class="navbar-brand" href="/">Home</a>
+    <link rel="icon" type="image/x-icon" href="{% static 'favicon1.ico' %}">
+    <h1 class="page-header">
+        Friction Head Loss
+    </h1>
+<nav class="navbar navbar-light bg-light"></nav>
+    <a class="navbar-brand" href="/" style="padding: 0.5rem;">Home</a>
 </nav>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pipe Calculation</title>
+    
+    
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <style>
+    <link rel="stylesheet" href="{% static 'pipe.css' %}">
+    <link rel="icon" type="image/x-icon" href="{% static 'favicon1.ico' %}">
+
+    <!-- <link rel="icon" type="image/x-icon" href="{% static 'pipe/favicon.ico' %}"> -->
+    <!-- <link rel="icon" type="image/x-icon" href="../static/favicon1.ico"> -->
+    <!-- <link rel="script" href="{% static 'pipe.js' %}"> -->
+    <!-- <style>
         body {
             font-family: Arial, sans-serif;
             background-color: #f8f9fa;
@@ -51,9 +64,9 @@
             background-color: #0056b3;
             border-color: #004085;
         }
-    </style>
+    </style> -->
 
-    <script>
+    <!-- <script>
         function resetForm() {
             document.getElementById("pipeForm").reset();
             document.getElementById("roughnessCoefficient").value = "";
@@ -62,25 +75,29 @@
             document.getElementById("pipeLength").value = "";
             document.getElementById("frictionloss").value = "";
         }
-    </script>
+    </script> -->
 </head>
 <body>
     <div class="container form-container">
-        <h1 class="text-center">Pipe Calculation</h1>
+        <!-- <h1 class="text-center">Pipe Calculation</h1> -->
         <form id="pipeForm" method="POST" action="{% url 'pipe_calculation' %}">
             {% csrf_token %}
             <div class="form-group">
                 <label for="pipeMaterial">Select Pipe Material</label>
                 <select class="form-select" id="pipeMaterial" name="pipe_material" onchange="selectRoughnessCoefficient()">
-                    <option value="cast_iron">Cast Iron</option>
+                    <option value="0" selected>Select Pipe Material</option>
+                    <option value="cast_iron_new">Cast Iron (New)</option>
+                    <option value="cast_iron_10_yr_old">Cast Iron (10 years old)</option>
+                    <option value="cast_iron_20_yr_old">Cast Iron (20 years old)</option>
                     <option value="concrete">Concrete</option>
-                    <option value="steel">Steel</option>
+                    <option value="steel_new">Steel</option>
+                    <option value="fiber">Fiber</option>
                     <option value="plastic">Plastic</option>
                 </select>
             </div>
             <div class="form-group">
                 <label for="roughnessCoefficient">Pipe Roughness Coefficient</label>
-                <input type="text" class="form-control" id="roughnessCoefficient" name="roughness_coefficient" required value="{{ roughness_coefficient|default:''  }}">
+                <input type="text" class="form-control" id="roughnessCoefficient" name="roughness_coefficient"  readonly required value="{{ roughness_coefficient|default:''  }}">
             </div>
             <div class="form-group">
                 <label for="flow_rate">flow rate (in cubic meters per sec)</label>
@@ -97,7 +114,7 @@
             </div>
             <div class="text-center">
                 <button type="submit" class="btn btn-primary">Calculate</button>
-                <button type="button" class="btn btn-secondary" onclick="resetForm()">Reset</button>
+                <button type="button" class="btn btn-secondary" onclick="handleReset()">Reset</button>
             </div>
             <div class="form-group">
                 <label for="frictionloss">friction loss (in meters)</label>
@@ -110,23 +127,32 @@
         
     </div>
 
-    <script>
+     <!-- <script>
         function selectRoughnessCoefficient() {
             const material = document.getElementById('pipeMaterial').value;
             const roughnessCoefficient = document.getElementById('roughnessCoefficient');
 
             switch (material) {
-                case 'cast_iron':
-                    roughnessCoefficient.value = '0.012';
+                case 'cast_iron_new':
+                    roughnessCoefficient.value = '130';
+                    break;
+                case 'cast_iron_10_yr_old':
+                    roughnessCoefficient.value = '110';
+                    break;
+                case 'cast_iron_20_yr_old':
+                    roughnessCoefficient.value = '94.5';
                     break;
                 case 'concrete':
-                    roughnessCoefficient.value = '0.015';
+                    roughnessCoefficient.value = '120';
                     break;
-                case 'steel':
-                    roughnessCoefficient.value = '0.010';
+                case 'steel_new':
+                    roughnessCoefficient.value = '145';
                     break;
                 case 'plastic':
-                    roughnessCoefficient.value = '0.009';
+                    roughnessCoefficient.value = '140';
+                    break;
+                case 'fiber':
+                    roughnessCoefficient.value = '140';
                     break;
                 default:
                     roughnessCoefficient.value = '';
@@ -142,6 +168,7 @@
             selectRoughnessCoefficient();
         });
 
-    </script>
+    </script>  -->
+    <script src="{% static 'pipe.js' %}"></script>
 </body>
 </html>
