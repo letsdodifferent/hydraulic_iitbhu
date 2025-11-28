@@ -11,6 +11,7 @@ cycler==0.12.1
 Django==5.1.4
 fonttools==4.60.1
 geojson==3.2.0
+gunicorn==23.0.0
 ImageIO==2.37.2
 kiwisolver==1.4.9
 lazy_loader==0.4
