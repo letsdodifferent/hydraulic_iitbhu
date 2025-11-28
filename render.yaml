@@ -1,9 +1,15 @@
 services:
   - type: web
-    name: hydraulics
+    name: hydraulics-iitbhu
     env: python
-    buildCommand: pip install -r requirements.txt
-    startCommand: gunicorn ug.wsgi:application
+    region: oregon
+    plan: free
+    buildCommand: "./build.sh"
+    startCommand: "gunicorn ug.wsgi:application --bind 0.0.0.0:$PORT"
     envVars:
       - key: PYTHON_VERSION
         value: 3.12.0
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DEBUG
+        value: false
